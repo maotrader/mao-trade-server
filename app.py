@@ -21,18 +21,15 @@ def update_order():
     ticket = data.get("ticket")
 
     if action == "OPEN" or action == "MODIFY":
-      # บันทึกหรืออัปเดตออเดอร์นี้ไว้ในรายการ Active
       active_orders[ticket] = data
       print(f"Active Order Updated [{action}]: Ticket {ticket}")
 
     elif action == "CLOSE":
-      # ลบออกจากรายการ Active เมื่อมีการปิดไม้
       if ticket in active_orders:
         del active_orders[ticket]
         print(f"Active Order Removed [CLOSE]: Ticket {ticket}")
 
     elif action == "CLOSE_ALL":
-      # ล้างทั้งหมดเมื่อปิดรวบ
       active_orders.clear()
       print("All Active Orders Cleared [CLOSE_ALL]")
 
@@ -44,6 +41,20 @@ def update_order():
 def get_active():
   # ส่งรายชื่อออเดอร์ที่กำลังเปิดอยู่ทั้งหมดกลับไปให้ Client ซิงค์
   return jsonify(list(active_orders.values())), 200
+
+
+@app.route("/clear", methods=["GET", "POST"])
+def clear_orders():
+  global active_orders
+  active_orders.clear()
+  print("All active orders have been cleared manually via /clear!")
+  return (
+      jsonify({
+          "status": "success",
+          "message": "All orders cleared from active list",
+      }),
+      200,
+  )
 
 
 if __name__ == "__main__":
